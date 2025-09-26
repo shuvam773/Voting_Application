@@ -1,0 +1,58 @@
+1) const userSchema = new mongoose.Schema({ ... });
+
+yaha hum schema ko design kar rahe hai
+Schema kya hai: Yeh ek blueprint ya design hai.
+Form ke Andar ki Fields jisko bharan ya fill karna jarurui hai
+
+***
+2) role me kya ho rah ahi
+role: {
+    type: String,  : yeh bata raha hai ki role text format me hoga
+                     voter ya admin
+    enum: ["voter", "admin"],
+    default: "voter"
+}
+
+enum: yeh ki list hai; "list of allowed options" hai
+  jaisey yaha dekhe to role sirf do cheezen ho sakti hai "voter " ya to "admin"
+
+  voter: jo vote karega 
+  admin: jo system ko manage karega
+  {
+    name: "Someone",
+    email: "someone@example.com",
+    role: "manager"  // ❌ ERROR! Kyunki "manager" allowed nahi hai
+}
+
+  default:"voter" if role specific nhi karega tho automatically voter mann lo
+  Example: Jaise school mein naya baccha aata hai toh woh automatically student ban jaata hai, teacher nahi
+**
+3)isVoted: {type: Boolean, default: false}
+ Yeh track karega ki user ne vote diya hai ya nahi
+ type: Boolean: Matlab sirf do values - true (haan) ya false (nahi)
+ Vote diya ki nahi? Pehle se 'nahi' maan lo
+
+ 4)userSchema.pre('save' ,async function(next){...})
+
+ pre('save')= ye ek documnet middleware hai iske under this curent documnet ko point out karta hai
+ yaha hum arrow function use nhi karengye q ki this kamm nhi karega 
+
+ if (!user.isModified('password')) return next();
+
+ = isak mtlb hai ki agaar pasword field imodified nhi hue to hassing ki koi zarurat nhi hai-- seedhe aage badho jao
+ isModified('password') ye check karta hai ki ye field last time se change hui hai ya nahi. Naye document pe ya jab password badalta hai, ye true hota hai.
+
+user.password = await bcrypt.hash(user.password, saltRounds);
+
+yaha hum plain text ko password ko hash kar rahe hai. Bcrypt automatically salt add karta hai aur finall hash me asayl embde hota hai
+Phir hum hashed value ko user.password me wapas likh dete hain
+
+next();
+
+Hashing ho gayi, ab middleware bol raha “theek hai, ab asli save() continue karo”. Mongoose me next() call karna zaroori hota hai taa ki control aage ja sake.
+
+5)userSchema.methods.comparePassword = async function (candidatePassword) {
+  return bcrypt.compare(candidatePassword, this.password); // (7)
+};
+
+isaka kamm hai user ne jo plain password diya hai i.e candidatePassword usko stored hashed password

@@ -1,0 +1,37 @@
+1) mongoose= mongoose ek toolkit hai jo humne databse se connect krne me help karta hai hai, explample ki traha samjhe to ek mobile phone hai jo database ko call karta hai
+, "simple bhasa me samjho to DB se batt karne wala phone hai"
+
+2)const connectionDB = async() => { ... }
+
+yaha pe hum ek function bana rahe hai jiska namm hai connectionDB,
+ye async function hai jo thoda time lega (jaisey call connect homne mein time lagta hai).
+async likh k hum js ko batate hai ki hume ye kamm karne me thoda time lagega tu intazar karne.
+
+3)try { ... }
+
+try block k under hum koshis karengye ki connection successfully hojaye
+try k under ye 3een line homgyi
+ await mongoose.connect(process.env.MONGO_URI,{
+            useNewUrlParser:true,
+            useUnifiedTopology:true,
+        });
+
+4)await
+await ka mtln hota hai ki "intazarr karo"
+Jaise number dial karne ke baad hum "ring" hone ka intezaar karte hain, waise hi database ko connect hone mein time lagta hai. await kehkar hum code ko rukne ko kehte hain jab tak connection poori tarah establish nahi ho jaata.
+
+5)process.env.MONGO_URI
+
+mann lo ye hamare dost ka phone number hain
+process.env kya hai: Jaise aap apna phone number kisi ko directly nahi batate, secretly rakhte ho. Waise hi database ka password/address directly code mein nahi likhte. Use environment variable (env file) mein rakhte hain taaki secure rahey.
+
+6)useNewUrlParser: true & useUnifiedTopology: true
+its a setting that is provided by the mongoose
+
+ye do setting Waise hi yeh settings database connection ko smooth aur stable banati hain.
+
+"example calling to a frined to call ki quality ko acchi karho"
+
+7)process.exit(1);
+poori app ko band kar deta hai 
+agar setting acchi se nhi hue to, band kardeta hai app ko

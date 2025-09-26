@@ -1,0 +1,63 @@
+user router explamnation
+
+registration ka function
+**************************************************
+1)try{} k under ka paty me kay ho raha hai;
+
+a) const data = req.body; const { email, password } = data;
+
+client ne jo json data bheja haai body me,usko data variable me save kr do.
+fir usmey se email, password ko nikaal lo.
+
+b)const existing = await User.findOne({ email: email });
+DB ,e check karo ki already user hai ki nhi 
+
+if (existing) { return res.status(409).json(...); }
+— Agar user mil jaata hai, to HTTP status 409 Conflict bhejo, aur ek message “Already exists, please login” ya kuch aisa.
+
+c)const hashedPassword = await bcrypt.hash(password, saltRound); data.password = hashedPassword;
+-Plain password ko hash karo (salt+hash) security tight hojagyi then usko data.password= ko hashedpassword se replace kardo
+
+d)const newUser = new User(data);
+ek naya Mongoose document object banao,jismey ab hased password aur sari user ki details honyi
+
+e)const response = await newUser.save();
+Use database me save karo 
+
+Mongoose mein user create karne ke do common tareeke hain:
+
+e.1)const newUser = new User(data);
+await newUser.save();
+Yahan, pehle tum ek instance banao newUser, fir .save() call karo us instance pe.
+
+e.2)User.create(data)
+await User.create(data);
+
+
+login ka function 
+*****************************************************
+router.post('/login', async (req, res) => { … })
+-ye ek Express route definitation hai,jo kisi HTTP POST request ko /login path pe handle karega
+
+1)const { adharCardNo, email, password } = req.body;
+- req.body me client front end se data ko bhej deta hai in json format
+-object ko destructure kr rahe hai usko variable me neekal rahe hai
+
+2)const user = await User.findOne({ adharCardNo });
+findOne({ adharCardNo }) ka matlab: database me us record ko dhoondo jiska adharCardNo field jo client ne diya hai, uske barabar ho.
+await isliye kyunki database query asynchronous hai — hum result ka intazaar kar rahe hain.
+
+3)const match = await bcrypt.compare(password, user.password);
+-bcrypt.compare(...) password checking ka standard function hai: client ne jo password diya hai (password), usko hashed password (user.password) se compare karta hai
+-user.password wo hashed version hai jo db me store hai
+-bcrypt.compare return ya to true/false karega
+await- q ki .compare asynchronous hai.
+
+4)const payload = { id: user.id, }
+- if login is succesfull then in the payload user ki object id banate hai
+-ye payload token k under jayaga,
+
+5)const token = generateToken(payload);
+generateToken ek function hai jo payload ko use karke ek JSON Web Token (JWT) ya koi aur token banata hai.
+
+Is token ko hum client ko denge, taki client aage ke requests me is token ko use kare (authorization ke liye).

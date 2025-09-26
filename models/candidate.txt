@@ -1,0 +1,79 @@
+Yeh code ek "Ummidwar" (Candidate) ka form design kar raha hai.
+
+1)const candidate = new mongoose.Schema({ ... });
+ye line ek naya schema design kar rahi hai candidate ka form types
+jismey name,age,party etc fields hai
+
+SPECIAL FOCUS: VOTES WALA PART 
+*******************************
+votes: [{
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User', 
+        required: true,
+    },
+    votedAt: { type: Date, default: Date.now() }
+}],
+
+2) votes:[{...}]
+ye ek list hai votes ko store karne k leeye
+[]-square brackets ka mtlb - ye ek list hai jismey multiple entries  ko rakh saket hai
+ex: votes ka reord rakh ne k leeye
+
+ye list do cheezen le raha hai jaisey
+a)user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User', 
+    required: true,
+}
+
+ObjectId : har ek user ka unique id hota hai
+ref: 'User- ye bata raha hai ki yeh ID humare pehele wale User Schema se aayegyi
+simple me bolu to :Vote dene wale ka roll number (ID) store karo
+
+b)votedAt:vote kab deeya date aur time 
+
+*************************************
+3)voteCount : {type:Number,default:0};
+total vote gine ka counter hai... agar nhi milla hai to bydefault 0 hai votes
+
+
+
+
+4)
+Candidate 1
+
+{
+    name: "Rahul",
+    age: 16,
+    party: "Student Union",
+    votes: [],        // Abhi tak kisi ne vote nahi diya
+    voteCount: 0      // Total votes: 0
+}
+
+Candidate 2
+
+{
+    name: "Priya", 
+    age: 15,
+    party: "School Leaders",
+    votes: [
+        {
+            user: "12345",      // User ID jisne vote diya
+            votedAt: "2024-01-15T10:30:00"  // Kab vote diya
+        },
+        {
+            user: "67890",      // Dusre user ka ID
+            votedAt: "2024-01-15T11:15:00"  // Kab vote diya  
+        }
+    ],
+    voteCount: 2      // Total 2 votes
+}
+
+5)Summary
+
+Ummidwar ki Basic Info: Naam, umar, party
+
+Votes ki Detail List: Kis-kis ne vote diya aur kab diya
+
+Total Votes Counter: Kitne total votes mile hain

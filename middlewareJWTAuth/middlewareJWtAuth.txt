@@ -1,0 +1,165 @@
+JWt Token Authentication
+
+Token: token are the string wich constin three things
+       i.e header, payload, signature,
+       tokens are stored at the client side, i.e on the browser
+
+jwt.sign() : this function is used to generate a new token
+            based on the provided payload
+
+
+jwt.verify(): this function is used to verify and decode the jwt token, it takes token and secret key
+
+
+************************************************************************************************************
+JWT authentication : Yeh code ek "Security Guard" ka kaam kar raha hai"
+
+JWT Token: Ek "VIP Pass" ya "Identity Card" jaisa hai
+
+Middleware: Ek "Security Guard" jaisa hai jo har request ko check karta hai
+
+Authentication: Pata karna ki user asli hai ya nahi
+*************************************************************************************************************
+
+1)const jwt = require('jsonwebtoken') : JWt tookit id card ko verify karne ka machine hai
+
+2)const jwtAuthMiddle = (req, res, next) => { ... }
+ye line security guard ka function bana raha hai, ye 3een chieeze le raha hai
+
+req:anne wala person
+res:jawab dene wala tool
+next():agle steps ko bolna "aage jane do"
+
+"Ek security guard banao jo har aane wale ko check kare"
+
+
+
+// iss mey token jaa raha hai generate hone k badd
+
+3)const authorization = req.headers.authorization;
+if(!authorization) {
+    return res.status(401).json({error:"invalid token"});
+}
+
+ye line puchti hai kya aapke pass id card hai?
+
+req.headers : Login Successful → Token Generate → Har Request ke Headers mein Token Jayega
+req.headers.authorization: Request k sath aay hue id card
+if(!authorization): Agar ID card nahi hai toh
+res.status(401): "Access Denied" message bhejna
+
+Agar ID card nahi hai toh entry deny karo
+
+
+//iss mey se token ko neekl rha hai humlog
+
+4)const token = req.headers.authorization.split(' ')[1];
+if(!token) {
+    return res.status(401).json({error:'unauthorized token'});
+}
+
+ ID card se asli token nikalna
+ split(' ')[1]: Kyunki usually format hota hai: Bearer actual_token
+ ID card se asli pass code alag karo
+
+ 5)try{
+    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+    req.user = decoded;
+    next();
+}
+
+jwt.verify(token,secret-key): id card ko machine me dall k check karna 
+process.env.SECRET_KEY: secretkey jo sirf hume he pata hai
+
+decoded: agar id sahi hai to user ki sari details nekalna
+
+req.user =decoded :user ki details request k sath attach karna 
+
+req object already exists (Express banata hai)
+Hum bas usme user property add kar rahe hain
+Koi alag se object create nahi kar rahe 
+
+req.user use kyun karein:
+
+✅ Isolation: Har user ka data alag rahega
+
+✅ Standard: Industry standard practice hai
+
+✅ Safe: Security risks nahi hain
+
+✅ Scalable: Multiple users handle kar sakte hain
+
+
+next(): Bolna "Aage jaane do, yeh allowed hai ,,
+ID card machine mein daalo, agar sahi hai toh aage jaane do
+
+*************************************************
+//token ko generate ko 
+const generateToken = (userData) => {
+    //generate a new token taking user data ,secret key and expire time
+    return jwt.sign(userData, process.env.SECRET_KEY, { expiresIn: "1h" });
+}
+
+userData kya hai: User ki information (jaise userId, name, email, etc.)
+
+1)return jwt.sign(userData, process.env.SECRET_KEY, { expiresIn: "1h" });
+yeh line 3een cheezen leta hai 
+
+userData-kiska token banana hai? token kis aadmi kaa ban raha hai
+userData = {
+    userId: "123",
+    name: "Rahul",
+    email: "rahul@example.com",
+    role: "voter"
+}
+
+process.env.SECRET_KEY : ek secret key jo sirf server ko pata hai, taki koi nakli token na bana lee
+{ expiresIn: "1h" } - Token ki expiry time
+
+**************************************************
+
+
+//token ko genrate karo aur cookie me save karo ye bhi ek tarika hai
+
+const generateToken = (userData) => {
+    // Token generate karo
+    const token = jwt.sign(userData, process.env.SECRET_KEY, { expiresIn: "1h" });
+    
+    // Cookie mein save karo
+    res.cookie('token', token, {
+        httpOnly: true,      // Security ke liye important
+        secure: process.env.NODE_ENV === 'production', // HTTPS pe hi kaam kare
+        maxAge: 60 * 60 * 1000, // 1 hour (milliseconds mein)
+        sameSite: 'strict'   // CSRF attacks se bachao
+    });
+    
+    return token;
+}
+
+ Middleware
+ const jwtAuthMiddle = (req, res, next) => {
+    // Pehle headers se check karo, fir cookies se
+    let token = null;
+
+    // 1. Check headers (Bearer token)
+    if (req.headers.authorization) {
+        token = req.headers.authorization.split(' ')[1];
+    }
+    // 2. Check cookies
+    else if (req.cookies && req.cookies.token) {
+        token = req.cookies.token;
+    }
+
+    if (!token) {
+        return res.status(401).json({ error: "Token not found" });
+    }
+
+    try {
+        // Verify token
+        const decoded = jwt.verify(token, process.env.SECRET_KEY);
+        req.user = decoded;
+        next();
+    } catch (error) {
+        res.status(401).json({ error: "Invalid token" });
+    }
+};

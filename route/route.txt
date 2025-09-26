@@ -1,0 +1,43 @@
+User Authentication
+/signup :-POST -create a new Account
+/login :-POST- login to the existing Account
+
+Voting
+/candidate :-GET =get all the candidate list
+/vote/:candidateID :-POSt= vote for the candiate you line
+
+voteCount
+/vote/counts :-GET= sorted list of the candiate accoundin to the votes they get
+
+userProfile
+/profile :-GET=get the user profile information
+/profile/password :-PUT= get change the password 
+
+
+Admin Cnadidate managemnet
+/candiate :POST= create new candidate
+/candidate/:candidateId :-PUT =to update the candiate profile
+/candiate/candidateID :-DELETE= to delete the candidate from the list
+
+
+
+//common status code
+| Code                          | Name / Meaning                                                         | Use case / example                                                                |                       |
+| ----------------------------- | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------- | --------------------- |
+| **200 OK**                    | Sab thik hai                                                           | GET request ka response, ya login success etc. ([MDN Web Docs][1])                |                       |
+| **201 Created**               | Naya resource ban gaya                                                 | POST request jisme resource create karo (jaise naya user) ([MDN Web Docs][1])     |                       |
+| **204 No Content**            | Content return nahi kar rahe                                           | DELETE request ke baad ya jab update ho jaye magar body na ho ([MDN Web Docs][1]) |                       |
+| **400 Bad Request**           | Client ki request invalid hai                                          | Agar request body format galat hai, missing fields etc. ([REST API Tutorial][2])  |                       |
+| **401 Unauthorized**          | Authentication required ya credentials invalid                         | Jab user login nahi hai ya token invalid ho ([REST API Tutorial][2])              |                       |
+| **403 Forbidden**             | User authenticated hai lekin permission nahi hai                       | Jaise user ne kisi restricted data access karne ki koshish ki ho ([Wikipedia][3]) |                       |
+| **404 Not Found**             | Requested resource nahi mila                                           | Agar user ya kisi endpoint ka path galat ho                                       | ([Dotcom-Monitor][4]) |
+| **409 Conflict**              | Conflict ho gaya                                                       | Duplicate entry, resource state conflict etc. ([Wikipedia][5])                    |                       |
+| **500 Internal Server Error** | Server me unexpected error                                             | Agar code crash ho ya DB down ho etc. ([REST API Tutorial][2])                    |                       |
+| **502 Bad Gateway**           | Server acting as gateway hai, upstream server se invalid response mila | Agar aapka app kisi proxy ya upstream server se chain me ho ([Dotcom-Monitor][4]) |                       |
+| **503 Service Unavailable**   | Server temporarily unavailable                                         | Maintenance ya overload ke time use hota hai ([Dotcom-Monitor][4])                |                       |
+
+[1]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status?utm_source=chatgpt.com "HTTP response status codes - MDN - Mozilla"
+[2]: https://restfulapi.net/http-status-codes/?utm_source=chatgpt.com "HTTP Status Codes - REST API Tutorial"
+[3]: https://en.wikipedia.org/wiki/HTTP_403?utm_source=chatgpt.com "HTTP 403"
+[4]: https://www.dotcom-monitor.com/blog/the-10-most-common-http-status-codes/?utm_source=chatgpt.com "The 10 Most Common HTTP Status Codes"
+[5]: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes?utm_source=chatgpt.com "List of HTTP status codes"
