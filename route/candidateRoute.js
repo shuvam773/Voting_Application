@@ -181,4 +181,3 @@ router.get('/vote/voteCount', async (req, res) => {
     }
 });
 
-module.exports = router;
