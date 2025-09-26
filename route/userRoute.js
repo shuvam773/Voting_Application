@@ -5,8 +5,9 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const { forgetLimiter } = require('../utils/rateLimiters');
 const { sendPasswordResetEmail } = require('../utils/mailer');
+const crypto = require('crypto');
 
-//create user Endpoint: http://localhost:3000/signup
+
 router.post('/signup', async (req, res) => {
     try {
         //take the user data from the body
@@ -21,9 +22,9 @@ router.post('/signup', async (req, res) => {
         }
 
         //pass word ko hash karo
-        const saltRound = 10;
-        const hashedPassword = await bcrypt.hash(password, saltRound);
-        data.password = hashedPassword;
+        // const saltRound = 10;
+        // const hashedPassword = await bcrypt.hash(password, saltRound);
+        // data.password = hashedPassword;
 
         //create a new user object in the user collections
         const newUser = new User(data);
@@ -41,7 +42,8 @@ router.post('/signup', async (req, res) => {
         console.log("Token is :", token);
         return res.status(200).json({ success: true, user: response, token: token });
     } catch (error) {
-        return res.status(409).json({ message: "Invalid crediantials or error occuerd" });
+        console.error("Signup error:", error);
+        return res.status(500).json({ message: "Internal server error" });
     }
 });
 
@@ -52,10 +54,12 @@ router.post('/login', async (req, res) => {
         const { adharCardNo, email, password } = req.body;
         //find the user by adharCard
         const user = await User.findOne({ adharCardNo });
+        console.log('User found:', user);
         if (!user) {
             return res.status(401).json({ message: "Invalid user " });
         }
         const match = await bcrypt.compare(password, user.password);
+        console.log('Password match result:', match);
         if (!match) {
             return res.status(401).json({ message: "user not matched with the id" });
         }

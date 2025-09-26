@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 require('dotenv').config()
 const mongoose = require('mongoose')
-// const userRoute = require('./route/userRoute');
+const userRoute = require('./route/userRoute');
 // const candidateRoute = require('./route/candidateRoute');
 
 
@@ -18,14 +18,14 @@ app.get('/healthcheck', (req, res) => {
 });
 
 // Use routes
-// app.use('/api/authUser', userRoute);
+app.use('/api/authUser', userRoute);
 // app.use('/api/authCandidate', candidateRoute);
 
 const PORT = process.env.PORT || 3000;
 
 const connectDB = async () => {
     try{
-        const connectionString= process.env.MONGO_URI ||"mongodb+srv://sanket2001:Sanket@2001@cluster0.oovwcnf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+        const connectionString= process.env.MONGO_URI
         await mongoose.connect(connectionString, {
             
             family: 4,
